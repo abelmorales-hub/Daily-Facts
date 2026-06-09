@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f0e0a">
+  <meta name="description" content="Un hecho fascinante cada día. Historia, misterios, mitología y más.">
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Daily Facts">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Daily Facts">
+  <meta property="og:description" content="Un hecho fascinante cada día">
+  <meta property="og:image" content="/icons/og-image.png">
+
+  <title>Daily Facts</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&display=swap');
+
+    :root {
+      --bg: #0f0e0a;
+      --bg2: #1a1710;
+      --gold: #a89060;
+      --gold-light: #d4aa6a;
+      --text: #f5edd8;
+      --text-muted: #c4b89a;
+      --text-dim: #7a6a4a;
+      --border: rgba(168,144,96,0.15);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      height: 100%;
+      background: #1a1710;
+      font-family: 'Source Serif 4', Georgia, serif;
+      color: var(--text);
+      overscroll-behavior: none;
+    }
+
+    /* ── App shell ── */
+    .app-shell {
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ── Top bar ── */
+    .top-bar {
+      padding: calc(var(--safe-top) + 14px) 20px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .top-date {
+      font-size: 12px;
+      color: var(--text-dim);
+      letter-spacing: .5px;
+    }
+
+    /* ── Screens ── */
+    .screen { display: none; flex: 1; overflow-y: auto; padding-bottom: 80px; }
+    .screen.active { display: block; }
+
+    /* ── Hero ── */
+    .hero-wrap {
+      margin: 10px 16px 0;
+      position: relative;
+      height: 290px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--bg2);
+    }
+    .hero-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: sepia(25%) brightness(0.8);
+      transition: opacity .4s;
+    }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(15,14,10,.96) 0%, rgba(15,14,10,.35) 55%, transparent 100%);
+    }
+    .hero-pill {
+      position: absolute; top: 14px; left: 14px;
+      background: rgba(168,144,96,.18);
+      border: 1px solid rgba(168,144,96,.4);
+      color: var(--gold-light);
+      font-size: 10px; letter-spacing: 1.8px;
+      text-transform: uppercase;
+      padding: 5px 13px; border-radius: 20px;
+    }
+    .hero-day {
+      position: absolute; top: 14px; right: 14px;
+      background: rgba(15,14,10,.65);
+      color: var(--gold);
+      font-size: 10px; letter-spacing: 1px;
+      padding: 5px 10px; border-radius: 20px;
+    }
+    .hero-title {
+      position: absolute; bottom: 18px; left: 16px; right: 16px;
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; line-height: 1.3; font-weight: 400;
+      color: var(--text);
+    }
+
+    /* ── Content ── */
+    .content-area { padding: 18px 20px 0; }
+    .excerpt {
+      color: var(--text-muted);
+      font-size: 14.5px; line-height: 1.85;
+      font-weight: 300; margin-bottom: 20px;
+    }
+    .read-btn {
+      width: 100%; padding: 15px;
+      background: var(--gold);
+      border: none; border-radius: 14px;
+      color: #0f0e0a;
+      font-family: 'Playfair Display', serif;
+      font-size: 15px; font-weight: 700;
+      letter-spacing: .5px; cursor: pointer;
+      transition: opacity .2s, transform .1s;
+    }
+    .read-btn:active { opacity: .8; transform: scale(.99); }
+
+    /* ── Streak ── */
+    .streak-section { padding: 20px 20px 0; }
+    .section-label {
+      font-size: 11px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+    .streak-bar { display: flex; gap: 6px; }
+    .streak-day {
+      flex: 1; height: 3px; border-radius: 2px;
+      background: rgba(168,144,96,.12);
+      transition: background .3s;
+    }
+    .streak-day.done { background: var(--gold); }
+
+    /* ── Share ── */
+    .share-btn {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; margin: 16px 20px 0;
+      padding: 12px; border-radius: 12px;
+      background: rgba(168,144,96,.07);
+      border: 1px solid var(--border);
+      color: var(--text-dim); font-size: 13px;
+      cursor: pointer; transition: background .2s;
+    }
+    .share-btn:hover { background: rgba(168,144,96,.12); }
+
+    /* ── Full article modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 100;
+      background: rgba(10,9,6,.92);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .modal-overlay.open { display: block; }
+    .modal-content {
+      max-width: 430px; margin: 0 auto;
+      padding: calc(var(--safe-top) + 20px) 24px calc(var(--safe-bottom) + 40px);
+      min-height: 100dvh;
+    }
+    .modal-back {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--gold); font-size: 14px;
+      cursor: pointer; margin-bottom: 24px;
+      background: none; border: none;
+    }
+    .modal-pill {
+      display: inline-block;
+      background: rgba(168,144,96,.15);
+      border: 1px solid rgba(168,144,96,.35);
+      color: var(--gold-light);
+      font-size: 10px; letter-spacing: 1.8px;
+      text-transform: uppercase;
+      padding: 4px 12px; border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px; line-height: 1.25;
+      font-weight: 400; color: var(--text);
+      margin-bottom: 20px;
+    }
+    .modal-img {
+      width: 100%; height: 220px;
+      object-fit: cover; border-radius: 14px;
+      margin-bottom: 24px;
+      filter: sepia(15%) brightness(0.85);
+    }
+    .modal-body {
+      color: var(--text-muted);
+      font-size: 15.5px; line-height: 1.9;
+      font-weight: 300;
+    }
+    .modal-body p { margin-bottom: 18px; }
+    .modal-body p:first-child::first-letter {
+      font-family: 'Playfair Display', serif;
+      font-size: 52px; line-height: .8;
+      float: left; margin: 6px 8px 0 0;
+      color: var(--gold-light);
+    }
+    .modal-loading {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--text-dim); font-size: 14px;
+      padding: 20px 0;
+    }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Categories screen ── */
+    .screen-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 400;
+      color: var(--text); padding: 20px 20px 4px;
+    }
+    .screen-sub {
+      font-size: 13px; color: var(--text-dim);
+      padding: 0 20px 20px;
+    }
+    .cat-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; padding: 0 16px;
+    }
+    .cat-card {
+      padding: 16px; border-radius: 16px;
+      cursor: pointer; border: 1px solid transparent;
+      transition: transform .15s, border-color .2s;
+      position: relative; overflow: hidden;
+    }
+    .cat-card:active { transform: scale(.97); }
+    .cat-card.locked { opacity: .45; cursor: default; }
+    .cat-emoji { font-size: 24px; display: block; margin-bottom: 10px; }
+    .cat-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px; font-weight: 400;
+      margin-bottom: 3px;
+    }
+    .cat-sub { font-size: 11px; opacity: .55; }
+    .cat-active-dot {
+      position: absolute; top: 12px; right: 12px;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--gold);
+    }
+
+    /* Category colors */
+    .cat-historia   { background: #1a150c; border-color: rgba(168,144,96,.35); color: #c4a060; }
+    .cat-misterio   { background: #0f0f1a; border-color: rgba(100,80,200,.35); color: #a080e0; }
+    .cat-mitologia  { background: #0d1a0f; border-color: rgba(60,160,80,.35);  color: #60c080; }
+    .cat-crimen     { background: #1a0d0d; border-color: rgba(200,60,60,.35);  color: #e07070; }
+    .cat-poesia     { background: #1a0f18; border-color: rgba(200,80,180,.35); color: #e080d0; }
+    .cat-ciencia    { background: #0d121a; border-color: rgba(60,130,200,.35); color: #70b0e0; }
+
+    /* ── Archive screen ── */
+    .archive-list { padding: 0 16px; }
+    .archive-item {
+      display: flex; gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .archive-item:last-child { border-bottom: none; }
+    .archive-thumb {
+      width: 62px; height: 62px;
+      border-radius: 12px; object-fit: cover;
+      flex-shrink: 0;
+      background: var(--bg2);
+      filter: sepia(20%) brightness(.85);
+    }
+    .archive-meta { font-size: 11px; color: var(--text-dim); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 5px; }
+    .archive-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px; line-height: 1.35;
+      color: var(--text-muted);
+      transition: color .2s;
+    }
+    .archive-item:hover .archive-title { color: var(--gold-light); }
+
+    /* ── Settings screen ── */
+    .settings-list { padding: 0 16px; }
+    .settings-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 0; border-bottom: 1px solid var(--border);
+    }
+    .settings-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: rgba(168,144,96,.1);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gold); font-size: 18px; flex-shrink: 0;
+    }
+    .settings-label { font-size: 15px; color: var(--text-muted); flex: 1; }
+    .settings-value { font-size: 13px; color: var(--text-dim); }
+    .toggle {
+      width: 44px; height: 24px; border-radius: 12px;
+      background: rgba(168,144,96,.2); border: none; cursor: pointer;
+      position: relative; transition: background .3s; flex-shrink: 0;
+    }
+    .toggle.on { background: var(--gold); }
+    .toggle::after {
+      content: ''; position: absolute;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: white; top: 3px; left: 3px;
+      transition: transform .3s;
+    }
+    .toggle.on::after { transform: translateX(20px); }
+
+    /* ── Bottom nav ── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px;
+      padding: 10px 0 calc(var(--safe-bottom) + 10px);
+      background: rgba(15,14,10,.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-around;
+      z-index: 50;
+    }
+    .nav-btn {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+      background: none; border: none; cursor: pointer;
+      color: var(--text-dim); font-size: 10px;
+      letter-spacing: .5px; text-transform: uppercase;
+      padding: 0 12px; transition: color .2s;
+      font-family: 'Source Serif 4', serif;
+    }
+    .nav-btn .nav-icon { font-size: 22px; }
+    .nav-btn.active { color: var(--gold); }
+
+    /* ── Toasts ── */
+    .toast {
+      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+      background: var(--bg2); border: 1px solid var(--border);
+      color: var(--text-muted); font-size: 13px;
+      padding: 10px 20px; border-radius: 20px;
+      z-index: 200; opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; }
+
+    /* ── Loading skeleton ── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg2) 25%, rgba(40,36,24,.8) 50%, var(--bg2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- Top bar -->
+  <div class="top-bar">
+    <span class="logo">Daily Facts</span>
+    <span class="top-date" id="topDate"></span>
+  </div>
+
+  <!-- ═══════════════════════════════ HOME ═══════════════════════════════ -->
+  <div class="screen active" id="screen-home">
+    <div class="hero-wrap">
+      <img class="hero-img" id="heroImg" src="" alt="hecho del día">
+      <div class="hero-overlay"></div>
+      <span class="hero-pill" id="heroPill">Historia</span>
+      <span class="hero-day" id="heroDay">Día 1</span>
+      <h1 class="hero-title" id="heroTitle">Cargando hecho del día...</h1>
+    </div>
+
+    <div class="content-area">
+      <p class="excerpt" id="heroExcerpt">Un momento, estamos trayendo algo fascinante para ti.</p>
+      <button class="read-btn" id="readBtn" onclick="openArticle()">
+        Leer el hecho completo →
+      </button>
+    </div>
+
+    <div class="streak-section">
+      <p class="section-label">Tu racha esta semana</p>
+      <div class="streak-bar" id="streakBar"></div>
+    </div>
+
+    <button class="share-btn" onclick="shareToday()">
+      ↗ Compartir el hecho de hoy
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════ CATEGORIES ═══════════════════════ -->
+  <div class="screen" id="screen-categories">
+    <p class="screen-title">Categorías</p>
+    <p class="screen-sub">Elige tu tema diario. Solo una activa a la vez.</p>
+    <div class="cat-grid" id="catGrid"></div>
+  </div>
+
+  <!-- ═══════════════════════════════ ARCHIVE ═══════════════════════════ -->
+  <div class="screen" id="screen-archive">
+    <p class="screen-title" id="archiveTitle">Archivo — Historia</p>
+    <div class="archive-list" id="archiveList">
+      <p style="color:var(--text-dim);font-size:14px;padding:20px 0">Cargando archivo...</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ SETTINGS ════════════════════════ -->
+  <div class="screen" id="screen-settings">
+    <p class="screen-title">Ajustes</p>
+    <div class="settings-list" id="settingsList"></div>
+  </div>
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-screen="home" onclick="showScreen('home', this)">
+      <span class="nav-icon">🏠</span>
+      <span>Hoy</span>
+    </button>
+    <button class="nav-btn" data-screen="categories" onclick="showScreen('categories', this)">
+      <span class="nav-icon">🗂️</span>
+      <span>Temas</span>
+    </button>
+    <button class="nav-btn" data-screen="archive" onclick="showScreen('archive', this)">
+      <span class="nav-icon">📚</span>
+      <span>Archivo</span>
+    </button>
+    <button class="nav-btn" data-screen="settings" onclick="showScreen('settings', this)">
+      <span class="nav-icon">⚙️</span>
+      <span>Ajustes</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ═══════════════════════════ ARTICLE MODAL ══════════════════════════ -->
+<div class="modal-overlay" id="articleModal">
+  <div class="modal-content">
+    <button class="modal-back" onclick="closeArticle()">← Volver</button>
+    <span class="modal-pill" id="modalPill">Historia</span>
+    <h2 class="modal-title" id="modalTitle"></h2>
+    <img class="modal-img" id="modalImg" src="" alt="">
+    <div class="modal-body" id="modalBody">
+      <div class="modal-loading">
+        <div class="spinner"></div>
+        <span>Expandiendo el hecho...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  window.ENV = {
+    SUPABASE_URL: 'https://lahyyogfbadkrvoxesod.supabase.co',
+    SUPABASE_KEY: 'sb_publishable_jW6Job5T9PlXKi93OWsR2Q_5qE-fwzD',
+  };
+</script>
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
+
+
+
+
+
+

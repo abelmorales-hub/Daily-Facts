@@ -1,0 +1,46 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  .github/workflows/daily-generate.yml
+#  Ejecuta el script de generación cada día a las 06:00 UTC (08:00 España)
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Generate Daily Facts
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # 06:00 UTC = 08:00 hora española (verano)
+  workflow_dispatch:        # Permite ejecutarlo manualmente desde GitHub
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: scripts/package.json
+
+      - name: Install dependencies
+        working-directory: scripts
+        run: npm ci
+
+      - name: Generate today's facts
+        working-directory: scripts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SUPABASE_URL:      ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node generate-daily.js
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ La generación de hechos diarios ha fallado."
+          echo "Revisa los logs de este workflow en GitHub Actions."
+          # Aquí puedes añadir un webhook a Slack o email si quieres

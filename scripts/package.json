@@ -1,0 +1,15 @@
+{
+  "name": "dailyfacts-scripts",
+  "version": "1.0.0",
+  "description": "Daily Facts – scripts de generación de contenido",
+  "type": "module",
+  "scripts": {
+    "generate": "node generate-daily.js",
+    "test-generate": "DRY_RUN=true node generate-daily.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.29.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "dotenv": "^16.4.0"
+  }
+}
