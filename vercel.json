@@ -1,26 +1,4 @@
 {
   "version": 2,
-  "buildCommand": null,
-  "outputDirectory": "app",
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/app/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/app/$1"
-    }
-  ],
-  "env": {
-    "ANTHROPIC_API_KEY": "@anthropic_api_key",
-    "SUPABASE_URL":      "lahyyogfbadkrvoxesod",
-    "SUPABASE_SERVICE_KEY": "@supabase_service_key"
-  },
-  "crons": [
-    {
-      "path": "/api/cron-generate",
-      "schedule": "0 6 * * *"
-    }
-  ]
+  "outputDirectory": "app"
 }
