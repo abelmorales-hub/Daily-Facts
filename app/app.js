@@ -12,7 +12,7 @@ const ANTHROPIC_URL = '/api/expand';   // proxy seguro – nunca expongas la API
 // ── Categories config ─────────────────────────────────────────────────────
 const CATEGORIES = [
   { key: 'historia',  label: 'Historia',   emoji: '📜', color: 'cat-historia',  available: true  },
-  { key: 'misterio',  label: 'Misterios',  emoji: '🔍', color: 'cat-misterio',  available: false },
+  { key: 'misterio',  label: 'Misterios',  emoji: '🔍', color: 'cat-misterio',  available: true },
   { key: 'mitologia', label: 'Mitología',  emoji: '⚡', color: 'cat-mitologia', available: false },
   { key: 'crimen',    label: 'Crímenes',   emoji: '🩸', color: 'cat-crimen',    available: false },
   { key: 'poesia',    label: 'Poesía',     emoji: '🪶', color: 'cat-poesia',    available: false },
