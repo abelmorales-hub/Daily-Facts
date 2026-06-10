@@ -1,4 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
+ // ─────────────────────────────────────────────────────────────────────────────
 //  app.js  –  Daily Facts PWA
 //  Depende de: Supabase JS (cargado desde CDN en index.html)
 //  Variables de entorno: window.SUPABASE_URL, window.SUPABASE_KEY
@@ -176,6 +176,18 @@ function openArticleWithFact(fact) {
   document.getElementById('modalPill').textContent  = CATEGORIES.find(c=>c.key===fact.category)?.label || 'Historia';
   document.getElementById('modalTitle').textContent = fact.title;
   document.getElementById('modalImg').src           = fact.image_url || '';
+
+document.getElementById('modalImg').style.cursor = 'zoom-in';
+document.getElementById('modalImg').onclick = () => {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:999;display:flex;align-items:center;justify-content:center;cursor:zoom-out';
+  const img = document.createElement('img');
+  img.src = fact.image_url;
+  img.style.cssText = 'max-width:95vw;max-height:95vh;object-fit:contain;border-radius:8px';
+  overlay.appendChild(img);
+  overlay.onclick = () => overlay.remove();
+  document.body.appendChild(overlay);
+};
 
   // Si ya hay full_text guardado, lo usamos directamente
   if (fact.full_text) {
