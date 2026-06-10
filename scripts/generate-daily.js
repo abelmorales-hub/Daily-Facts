@@ -197,9 +197,18 @@ async function main() {
       }
     }
 
-    // 4. Obtener imagen de Wikimedia Commons
+   // 4. Obtener imagen — si no hay imagen o no hay full_text, reintenta
     const imageUrl = await getWikimediaImage(factData.image_query);
-    console.log(`   🖼  Imagen: ${imageUrl || 'no encontrada'}`);
+    
+    if (!imageUrl || !factData.full_text) {
+      console.log(`   ⚠️  Sin imagen o sin texto completo, reintentando...`);
+      usedTitles.push(factData.title);
+      factData = null;
+      attempts = 0;
+      continue;
+    }
+    
+    console.log(`   🖼  Imagen: ${imageUrl}`);
 
     // 5. Guardar en Supabase
     const { error } = await supabase.from('facts').insert({
