@@ -175,7 +175,7 @@ async function main() {
     let factData  = null;
     let attempts  = 0;
 
-    while (!factData && attempts < 3) {
+    while (!factData && attempts < 10) {
       attempts++;
       try {
         const response = await anthropic.messages.create({
@@ -186,29 +186,28 @@ async function main() {
         });
 
         const raw  = response.content[0].text.trim();
-        // Extraer JSON limpiando posibles bloques de código
         const json = raw.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
-        factData   = JSON.parse(json);
-        console.log(`   🤖 Generado: "${factData.title}"`);
+        const candidate = JSON.parse(json);
+        console.log(`   🤖 Generado: "${candidate.title}"`);
+
+        // Comprobar imagen y full_text antes de aceptar
+        const imageUrl = await getWikimediaImage(candidate.image_query);
+        if (!imageUrl || !candidate.full_text) {
+          console.log(`   ⚠️  Sin imagen o texto, reintentando...`);
+          usedTitles.push(candidate.title);
+          continue;
+        }
+
+        factData = { ...candidate, imageUrl };
+        console.log(`   🖼  Imagen: ${imageUrl}`);
 
       } catch (e) {
         console.warn(`   ⚠️  Intento ${attempts} fallido:`, e.message);
-        if (attempts === 3) throw e;
+        if (attempts === 10) throw e;
       }
     }
 
-   // 4. Obtener imagen — si no hay imagen o no hay full_text, reintenta
-    const imageUrl = await getWikimediaImage(factData.image_query);
-    
-    if (!imageUrl || !factData.full_text) {
-      console.log(`   ⚠️  Sin imagen o sin texto completo, reintentando...`);
-      usedTitles.push(factData.title);
-      factData = null;
-      attempts = 0;
-      continue;
-    }
-    
-    console.log(`   🖼  Imagen: ${imageUrl}`);
+  
 
     // 5. Guardar en Supabase
     const { error } = await supabase.from('facts').insert({
@@ -217,7 +216,7 @@ async function main() {
       title:      factData.title,
       excerpt:    factData.excerpt,
       full_text:  factData.full_text,
-      image_url:  imageUrl || null,
+      image_url:  factData.imageUrl || null,
       era:        factData.era || null,
       region:     factData.region || null,
     });
