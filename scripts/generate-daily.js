@@ -25,7 +25,7 @@ const supabase  = createClient(
 const ACTIVE_CATEGORIES = [
   'historia',
   // Descomenta cuando actives cada categoría:
-  // 'misterio',
+   'misterio',
   // 'mitologia',
   // 'crimen',
   // 'poesia',
