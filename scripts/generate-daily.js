@@ -26,7 +26,7 @@ const ACTIVE_CATEGORIES = [
   'historia',
   // Descomenta cuando actives cada categoría:
    'misterio',
-  // 'mitologia',
+   'mitologia',
   // 'crimen',
   // 'poesia',
   // 'ciencia',
