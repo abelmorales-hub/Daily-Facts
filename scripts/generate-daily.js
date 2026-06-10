@@ -27,9 +27,9 @@ const ACTIVE_CATEGORIES = [
   // Descomenta cuando actives cada categoría:
    'misterio',
    'mitologia',
-  // 'crimen',
-  // 'poesia',
-  // 'ciencia',
+   'crimen',
+   'poesia',
+   'ciencia',
 ];
 
 // ── Prompts por categoría ────────────────────────────────────────────────────

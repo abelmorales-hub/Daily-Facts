@@ -14,9 +14,9 @@ const CATEGORIES = [
   { key: 'historia',  label: 'Historia',   emoji: '📜', color: 'cat-historia',  available: true  },
   { key: 'misterio',  label: 'Misterios',  emoji: '🔍', color: 'cat-misterio',  available: true },
   { key: 'mitologia', label: 'Mitología',  emoji: '⚡', color: 'cat-mitologia', available: true },
-  { key: 'crimen',    label: 'Crímenes',   emoji: '🩸', color: 'cat-crimen',    available: false },
-  { key: 'poesia',    label: 'Poesía',     emoji: '🪶', color: 'cat-poesia',    available: false },
-  { key: 'ciencia',   label: 'Ciencia',    emoji: '🔭', color: 'cat-ciencia',   available: false },
+  { key: 'crimen',    label: 'Crímenes',   emoji: '🩸', color: 'cat-crimen',    available: true },
+  { key: 'poesia',    label: 'Poesía',     emoji: '🪶', color: 'cat-poesia',    available: true },
+  { key: 'ciencia',   label: 'Ciencia',    emoji: '🔭', color: 'cat-ciencia',   available: true },
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────
