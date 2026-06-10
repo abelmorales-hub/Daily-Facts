@@ -7,7 +7,7 @@ name: Generate Daily Facts
 
 on:
   schedule:
-    - cron: '0 6 * * *'   # 06:00 UTC = 08:00 hora española (verano)
+    - cron: '0 23 * * *'   # 06:00 UTC = 08:00 hora española (verano)
   workflow_dispatch:        # Permite ejecutarlo manualmente desde GitHub
 
 jobs:
